@@ -34,7 +34,6 @@ import os
 from lxml import html
 from requests import get
 
-os.environ["SCRAPERWIKI_DATABASE_NAME"] = "data.sqlite"
 page = get('http://bestfightodds.com')
     
 cutoff_point = page.text.find('Future Events')
@@ -44,19 +43,21 @@ btree = tree.xpath('////div[@class="table-scroller"]/table/tbody/tr[@class="even
 rtree = tree.xpath('////div[@class="table-scroller"]/table/tbody/tr[@class="odd"]')
 
 for index, i in enumerate(btree):
+    name = i[0][0][0].text
     if not i[1][0][0][0].text:
-        temp = None
+        odds = None
     else:
-        temp = i[1][0][0][0].text
+        odds = i[1][0][0][0].text
     index = 1000 + index
-    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":i[0][0][0].text, "odds":temp}, table_name="data")
+    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":name, "odds":odds}, table_name="data")
 
 for index, i in enumerate(rtree):
+    name = i[0][0][0].text
     if not i[1][0][0][0].text:
-        temp = None
+        odds = None
     else:
-        temp = i[1][0][0][0].text
+        odds = i[1][0][0][0].text
     index = 2000 + index
-    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":i[0][0][0].text, "odds":temp}, table_name="data")
+    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":name, "odds":odds}, table_name="data")
 
 os.rename("scraperwiki.sqlite", "data.sqlite")
