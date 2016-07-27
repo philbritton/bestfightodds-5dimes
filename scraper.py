@@ -58,5 +58,3 @@ for index, i in enumerate(rtree):
         temp = i[1][0][0][0].text
     index = 2000 + index
     scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":i[0][0][0].text, "odds":temp}, table_name="data")
-
-scraperwiki.sql.commit()
