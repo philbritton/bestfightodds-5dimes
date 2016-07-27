@@ -22,3 +22,39 @@
 # All that matters is that your final data is written to an SQLite database
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
+
+
+"""5dimes mma odds"""
+# coding=utf-8
+#
+# Scrapes bestfightodds.com and makes data available on IRC via search
+
+import scraperwiki
+import os
+from lxml import html
+from requests import get
+
+os.environ["SCRAPERWIKI_DATABASE_NAME"] = "data.sqlite"
+page = get('http://bestfightodds.com')
+    
+cutoff_point = page.text.find('Future Events')
+tree = html.fromstring(page.text[:cutoff_point])
+
+btree = tree.xpath('////div[@class="table-scroller"]/table/tbody/tr[@class="even"]')
+rtree = tree.xpath('////div[@class="table-scroller"]/table/tbody/tr[@class="odd"]')
+
+for index, i in enumerate(btree):
+    if not i[1][0][0][0].text:
+        temp = None
+    else:
+        temp = i[1][0][0][0].text
+    index = 1000 + index
+    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":i[0][0][0].text, "odds":temp}, table_name="data")
+
+for index, i in enumerate(rtree):
+    if not i[1][0][0][0].text:
+        temp = None
+    else:
+        temp = i[1][0][0][0].text
+    index = 2000 + index
+    scraperwiki.sqlite.save(unique_keys=["index"], data={"index":index, "name":i[0][0][0].text, "odds":temp}, table_name="data")
